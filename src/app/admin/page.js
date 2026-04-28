@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
@@ -13,7 +13,7 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const forbiddenMessage =
     searchParams.get("error") === "forbidden"
-      ? "Akses ditolak. Akun Anda belum memiliki role admin (role: \"admin\") di user_metadata atau app_metadata Supabase. Hubungi super admin untuk aktivasi akses."
+      ? "Akses ditolak. Hubungi super admin untuk aktivasi akses."
       : "";
 
   const handleLogin = async (event) => {
@@ -59,10 +59,10 @@ export default function AdminLoginPage() {
               id="email"
               type="email"
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full rounded-lg border border-[#dfc995] bg-[#fffaf0] px-4 py-2.5 text-sm text-[#4e3915] outline-none transition focus:border-[#c9a84c] focus:ring-2 focus:ring-[#e8d190]"
-              placeholder="hindasah.agi@gmail.com"
+              placeholder="email@gmail.com"
             />
           </div>
 
@@ -74,10 +74,10 @@ export default function AdminLoginPage() {
               id="password"
               type="password"
               value={password}
-              onChange={(event) => setPassword(event.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full rounded-lg border border-[#dfc995] bg-[#fffaf0] px-4 py-2.5 text-sm text-[#4e3915] outline-none transition focus:border-[#c9a84c] focus:ring-2 focus:ring-[#e8d190]"
-              placeholder="@Agi891106"
+              placeholder="••••••••"
             />
           </div>
 
@@ -97,5 +97,13 @@ export default function AdminLoginPage() {
         </form>
       </div>
     </main>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
