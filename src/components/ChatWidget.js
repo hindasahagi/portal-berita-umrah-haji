@@ -63,12 +63,11 @@ export default function ChatWidget() {
             <div className="flex items-center gap-3">
               {/* Foto Profil di Header */}
               <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border-2 border-white/20 bg-white">
-                <Image 
-                  src="/cs-muslimah.png" 
-                  alt="Aisyah Avatar" 
-                  fill 
-                  className="object-cover object-top"
-                />
+                <img 
+  src="/cs-muslimah.png" 
+  alt="Aisyah" 
+  className="h-full w-full object-cover" 
+/>
               </div>
               <div>
                 <p className="text-sm font-bold text-white">Aisyah - Tanur Assistant</p>
