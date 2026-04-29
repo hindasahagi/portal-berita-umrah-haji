@@ -2,12 +2,43 @@
 
 import { useState, useRef, useEffect } from "react";
 
+// --- KOMPONEN AVATAR SVG (Karakter Muslim Peci) ---
+// Kita buat komponen kecil agar kode utama tidak kotor.
+const MuslimAvatar = ({ className = "h-9 w-9" }) => (
+  <svg 
+    viewBox="0 0 128 128" 
+    className={`${className} rounded-full object-cover`}
+    fill="none" 
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {/* Background Lingkaran Teal */}
+    <circle cx="64" cy="64" r="64" fill="#0D7A6B"/>
+    
+    {/* Peci (Kopiah) */}
+    <path d="M40 35C40 29.4772 44.4772 25 50 25H78C83.5228 25 88 29.4772 88 35V45H40V35Z" fill="#2B3A32"/>
+    
+    {/* Wajah */}
+    <path d="M92 70C92 85.464 79.464 98 64 98C48.536 98 36 85.464 36 70V45H92V70Z" fill="#FDDAC1"/>
+    
+    {/* Mata */}
+    <circle cx="52" cy="60" r="4" fill="#2B3A32"/>
+    <circle cx="76" cy="60" r="4" fill="#2B3A32"/>
+    
+    {/* Senyum */}
+    <path d="M54 78C54 78 58 83 64 83C70 83 74 78 74 78" stroke="#2B3A32" strokeWidth="3" strokeLinecap="round"/>
+    
+    {/* Baju/Koko sederhana */}
+    <path d="M26 110C26 102.268 32.268 96 40 96H88C95.732 96 102 102.268 102 110V128H26V110Z" fill="white"/>
+  </svg>
+);
+// --------------------------------------------------
+
 export default function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       role: "assistant",
-      content: "Assalamu'alaikum! Saya asisten AI Tanur Muthmainnah Tour. Ada yang bisa saya bantu seputar umrah dan haji? 🕌",
+      content: "Assalamu'alaikum! Saya Ali, asisten AI Tanur Muthmainnah Tour. Ada yang bisa saya bantu seputar umrah dan haji? 😊",
     },
   ]);
   const [input, setInput] = useState("");
@@ -39,7 +70,7 @@ export default function ChatWidget() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Maaf, terjadi gangguan koneksi. Silakan coba lagi." },
+        { role: "assistant", content: "Maaf, Ali sedang gangguan koneksi. Silakan coba lagi sebentar lagi ya." },
       ]);
     } finally {
       setIsLoading(false);
@@ -57,13 +88,15 @@ export default function ChatWidget() {
     <div className="fixed bottom-6 right-6 z-50">
       {isOpen && (
         <div className="mb-4 flex h-[500px] w-[350px] flex-col overflow-hidden rounded-2xl border border-[#0D7A6B]/20 bg-white shadow-2xl">
+          {/* HEADER CHAT */}
           <div className="flex items-center justify-between bg-[#0D7A6B] px-4 py-3">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20 text-lg">
-                🕌
-              </div>
+              {/* --- PERUBAHAN 1: LOGO HEADER --- */}
+              {/* Ganti div emoji dengan komponen avatar SVG */}
+              <MuslimAvatar className="h-10 w-10 border-2 border-white/20" />
+              {/* ------------------------------- */}
               <div>
-                <p className="text-sm font-bold text-white">Tanur AI Assistant</p>
+                <p className="text-sm font-bold text-white">Ali - Tanur Assistant</p>
                 <p className="text-xs text-white/70">Online • Siap membantu</p>
               </div>
             </div>
@@ -72,13 +105,15 @@ export default function ChatWidget() {
             </button>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-[#F8FFFE]">
+          {/* AREA PESAN */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#F8FFFE]">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                 {msg.role === "assistant" && (
-                  <div className="mr-2 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#0D7A6B] text-xs">
-                    🕌
-                  </div>
+                  /* --- PERUBAHAN 2: AVATAR DI BUBBLE --- */
+                  /* Ganti div emoji kecil dengan avatar SVG kecil */
+                  <MuslimAvatar className="mr-2 h-7 w-7 flex-shrink-0" />
+                  /* ------------------------------------- */
                 )}
                 <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
                   msg.role === "user"
@@ -89,11 +124,13 @@ export default function ChatWidget() {
                 </div>
               </div>
             ))}
+            
+            {/* LOADING STATE */}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="mr-2 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-[#0D7A6B] text-xs">
-                  🕌
-                </div>
+                {/* --- PERUBAHAN 3: AVATAR DI LOADING --- */}
+                <MuslimAvatar className="mr-2 h-7 w-7 flex-shrink-0" />
+                {/* --------------------------------------- */}
                 <div className="rounded-2xl rounded-bl-sm bg-white px-4 py-3 shadow-sm border border-gray-100">
                   <div className="flex gap-1">
                     <span className="h-2 w-2 animate-bounce rounded-full bg-[#0D7A6B]" style={{ animationDelay: "0ms" }} />
@@ -106,6 +143,7 @@ export default function ChatWidget() {
             <div ref={messagesEndRef} />
           </div>
 
+          {/* QUICK SUGGESTIONS & INPUT AREA (Tetap Sama) */}
           <div className="border-t border-gray-100 bg-white px-3 py-2">
             <div className="flex gap-2 overflow-x-auto pb-1">
               {["Syarat dokumen?", "Biaya umrah?", "Jadwal berangkat?"].map((q) => (
@@ -142,11 +180,19 @@ export default function ChatWidget() {
         </div>
       )}
 
+      {/* TOMBOL DRIGGER CHAT */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0D7A6B] text-2xl shadow-lg hover:brightness-110 transition"
+        className="flex h-14 w-14 items-center justify-center rounded-full bg-[#0D7A6B] text-2xl shadow-lg hover:brightness-110 transition overflow-hidden"
       >
-        {isOpen ? "✕" : "🕌"}
+        {/* --- PERUBAHAN 4: LOGO TOMBOL UTAMA --- */}
+        {isOpen ? (
+          <span className="text-white text-3xl">✕</span>
+        ) : (
+          /* Ganti emoji masjid dengan avatar SVG */
+          <MuslimAvatar className="h-full w-full" />
+        )}
+        {/* -------------------------------------- */}
       </button>
     </div>
   );
