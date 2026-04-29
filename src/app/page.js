@@ -1,3 +1,4 @@
+import ChatWidget from "@/components/ChatWidget";
 import Image from "next/image";
 import { BookOpenText, Newspaper, ShieldCheck, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -138,15 +139,15 @@ export default async function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FDF8F0] font-sans text-[#2B3A32]">
-      <header className="sticky top-0 z-20 border-b border-[#E6D9BE] bg-[#FDF8F0]/95 backdrop-blur">
+    <div className="min-h-screen bg-white font-sans text-[#0A3D35]">
+      <header className="sticky top-0 z-20 border-b border-[#E6D9BE] bg-white/95 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <a className="text-xl font-bold tracking-tight text-[#4A7C59]" href="#">
-            Portal Umrah & Haji
+          <a className="text-xl font-bold tracking-tight text-[#0D7A6B]" href="#">
+            PORTAL - TANUR MUTHMAINNAH TOUR
           </a>
 
           <nav className="hidden md:block">
-            <ul className="flex items-center gap-6 text-sm font-medium text-[#4A7C59]">
+            <ul className="flex items-center gap-6 text-sm font-medium text-[#0D7A6B]">
               <li>
                 <a className="transition hover:text-[#C9A84C]" href="#">
                   Beranda
@@ -181,11 +182,11 @@ export default async function Home() {
           </nav>
         </div>
         <details className="border-t border-[#E6D9BE] md:hidden">
-          <summary className="cursor-pointer list-none px-6 py-3 text-sm font-semibold text-[#4A7C59]">
+          <summary className="cursor-pointer list-none px-6 py-3 text-sm font-semibold text-[#0D7A6B]">
             Menu
           </summary>
-          <nav className="bg-[#FDF8F0] px-6 pb-4">
-            <ul className="space-y-3 text-sm font-medium text-[#4A7C59]">
+          <nav className="bg-white px-6 pb-4">
+            <ul className="space-y-3 text-sm font-medium text-[#0D7A6B]">
               <li>
                 <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#">
                   Beranda
@@ -234,7 +235,7 @@ export default async function Home() {
           <div className="absolute inset-0 bg-[#1C2A24]/60" />
           <div className="relative mx-auto w-full max-w-6xl px-6 py-28 md:py-36">
             <div className="max-w-3xl">
-              <p className="mb-5 inline-flex rounded-full bg-[#E8F4FD]/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#4A7C59]">
+              <p className="mb-5 inline-flex rounded-full bg-[#E8F4FD]/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#0D7A6B]">
                 Informasi Ibadah
               </p>
               <h1 className="font-serif text-4xl font-bold leading-tight text-white md:text-6xl">
@@ -264,10 +265,10 @@ export default async function Home() {
 
         <section id="paket" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 py-20">
           <div className="mb-10 max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#4A7C59]">
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0D7A6B]">
               Paket Umrah & Haji
             </p>
-            <h2 className="mt-2 font-serif text-3xl font-bold text-[#2B3A32] md:text-4xl">
+            <h2 className="mt-2 font-serif text-3xl font-bold text-[#0A3D35] md:text-4xl">
               Pilihan Paket Sesuai Kebutuhan Jamaah
             </h2>
           </div>
@@ -285,14 +286,14 @@ export default async function Home() {
                   className="mb-5 h-44 w-full rounded-xl object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <h3 className="font-serif text-2xl font-bold text-[#4A7C59]">
+                <h3 className="font-serif text-2xl font-bold text-[#0D7A6B]">
                   {paket.nama}
                 </h3>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#4A7C59]">
+                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#0D7A6B]">
                   {paket.jenis}
                 </p>
                 <p className="mt-4 text-3xl font-bold text-[#C9A84C]">{paket.harga}</p>
-                <p className="mt-2 text-sm font-medium text-[#4A7C59]">
+                <p className="mt-2 text-sm font-medium text-[#0D7A6B]">
                   Durasi: {paket.durasi}
                 </p>
                 <p className="mt-4 min-h-20 text-sm leading-7 text-[#4B5A54]">
@@ -300,7 +301,7 @@ export default async function Home() {
                 </p>
                 <button
                   type="button"
-                  className="mt-6 w-full rounded-full bg-[#4A7C59] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+                  className="mt-6 w-full rounded-full bg-[#0D7A6B] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
                 >
                   Pesan Sekarang
                 </button>
@@ -324,11 +325,11 @@ export default async function Home() {
           className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-20 pt-4"
         >
           <div className="mb-8 flex items-center justify-between">
-            <h2 className="font-serif text-3xl font-bold text-[#2B3A32]">
+            <h2 className="font-serif text-3xl font-bold text-[#0A3D35]">
               Artikel Terbaru
             </h2>
             <a
-              className="text-sm font-semibold text-[#4A7C59] hover:text-[#C9A84C]"
+              className="text-sm font-semibold text-[#0D7A6B] hover:text-[#C9A84C]"
               href="#artikel"
             >
               Lihat Semua
@@ -349,10 +350,10 @@ export default async function Home() {
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
                 <div className="p-6">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#4A7C59]">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-[#0D7A6B]">
                     Artikel
                   </p>
-                  <h3 className="mt-3 font-serif text-xl font-bold leading-8 text-[#2B3A32]">
+                  <h3 className="mt-3 font-serif text-xl font-bold leading-8 text-[#0A3D35]">
                     {artikel.judul}
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[#4B5A54]">
@@ -366,7 +367,7 @@ export default async function Home() {
 
         <section id="panduan" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-20">
           <div className="rounded-2xl border border-[#E6D9BE] bg-[#E8F4FD] p-10">
-            <h2 className="font-serif text-3xl font-bold text-[#2B3A32]">
+            <h2 className="font-serif text-3xl font-bold text-[#0A3D35]">
               Panduan Singkat
             </h2>
             <p className="mt-4 max-w-3xl text-[#4B5A54]">
@@ -379,14 +380,14 @@ export default async function Home() {
         <section id="jadwal" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-20">
           <div className="mb-6 flex items-end justify-between">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-[#4A7C59]">
+              <p className="text-sm font-semibold uppercase tracking-wide text-[#0D7A6B]">
                 Jadwal Terdekat
               </p>
-              <h2 className="mt-2 font-serif text-3xl font-bold text-[#2B3A32]">
+              <h2 className="mt-2 font-serif text-3xl font-bold text-[#0A3D35]">
                 Keberangkatan Umrah & Haji
               </h2>
             </div>
-            <a href="/jadwal" className="text-sm font-semibold text-[#4A7C59] hover:text-[#C9A84C]">
+            <a href="/jadwal" className="text-sm font-semibold text-[#0D7A6B] hover:text-[#C9A84C]">
               Lihat Semua
             </a>
           </div>
@@ -403,10 +404,10 @@ export default async function Home() {
               <tbody>
                 {jadwalBerangkat.map((row) => (
                   <tr key={row.id} className="border-t border-[#EFE3C9]">
-                    <td className="px-4 py-3 font-medium text-[#2B3A32]">{row.maskapai}</td>
+                    <td className="px-4 py-3 font-medium text-[#0A3D35]">{row.maskapai}</td>
                     <td className="px-4 py-3 text-[#4B5A54]">{row.rute}</td>
                     <td className="px-4 py-3 text-[#4B5A54]">{row.waktu}</td>
-                    <td className="px-4 py-3 font-semibold text-[#4A7C59]">{row.sisaSeat}</td>
+                    <td className="px-4 py-3 font-semibold text-[#0D7A6B]">{row.sisaSeat}</td>
                   </tr>
                 ))}
                 {!jadwalBerangkat.length && (
@@ -424,7 +425,7 @@ export default async function Home() {
         <section className="mx-auto w-full max-w-6xl px-6 pb-20">
           <div className="grid gap-8 md:grid-cols-2">
             <article className="rounded-2xl border border-[#E6D9BE] bg-white p-7">
-              <h3 className="font-serif text-2xl font-bold text-[#2B3A32]">
+              <h3 className="font-serif text-2xl font-bold text-[#0A3D35]">
                 Daftar Maskapai Rekanan
               </h3>
               <div className="mt-5 flex flex-wrap gap-3">
@@ -443,7 +444,7 @@ export default async function Home() {
             </article>
 
             <article className="rounded-2xl border border-[#E6D9BE] bg-white p-7">
-              <h3 className="font-serif text-2xl font-bold text-[#2B3A32]">
+              <h3 className="font-serif text-2xl font-bold text-[#0A3D35]">
                 Video Umrah Haji Terbaru
               </h3>
               <div className="mt-5 overflow-hidden rounded-xl border border-[#E6D9BE]">
@@ -461,7 +462,7 @@ export default async function Home() {
 
         <section className="mx-auto w-full max-w-6xl px-6 pb-20">
           <div className="mb-6">
-            <h3 className="font-serif text-3xl font-bold text-[#2B3A32]">
+            <h3 className="font-serif text-3xl font-bold text-[#0A3D35]">
               Flyer Umrah Haji Terbaru
             </h3>
           </div>
@@ -479,7 +480,7 @@ export default async function Home() {
                   className="h-48 w-full object-cover"
                   sizes="(max-width: 768px) 100vw, 33vw"
                 />
-                <p className="px-4 py-3 text-sm font-semibold text-[#2B3A32]">
+                <p className="px-4 py-3 text-sm font-semibold text-[#0A3D35]">
                   {flyer.title}
                 </p>
               </article>
@@ -489,10 +490,10 @@ export default async function Home() {
 
         <section className="mx-auto w-full max-w-6xl px-6 pb-20">
           <div className="mb-10 max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#4A7C59]">
+            <p className="text-sm font-semibold uppercase tracking-wide text-[#0D7A6B]">
               Mengapa Pilih Kami
             </p>
-            <h2 className="mt-2 font-serif text-3xl font-bold text-[#2B3A32] md:text-4xl">
+            <h2 className="mt-2 font-serif text-3xl font-bold text-[#0A3D35] md:text-4xl">
               Komitmen Kami untuk Jamaah Indonesia
             </h2>
           </div>
@@ -504,10 +505,10 @@ export default async function Home() {
                 key={item.judul}
                 className="rounded-2xl border border-[#E6D9BE] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F4FD] text-[#4A7C59]">
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F4FD] text-[#0D7A6B]">
                   <Icon size={22} strokeWidth={2.2} />
                 </div>
-                <h3 className="font-serif text-xl font-bold text-[#2B3A32]">
+                <h3 className="font-serif text-xl font-bold text-[#0A3D35]">
                   {item.judul}
                 </h3>
                 <p className="mt-2 text-sm leading-7 text-[#4B5A54]">
@@ -520,7 +521,7 @@ export default async function Home() {
         </section>
 
         <section id="tentang" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-24">
-          <div className="rounded-2xl bg-[#4A7C59] p-10 text-white">
+          <div className="rounded-2xl bg-[#0D7A6B] p-10 text-white">
             <h2 className="font-serif text-3xl font-bold">Tentang Kami</h2>
             <p className="mt-4 max-w-3xl text-[#E7F0EA]">
               Portal ini hadir untuk menyediakan informasi tepercaya seputar umrah
@@ -531,12 +532,13 @@ export default async function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-[#E6D9BE] bg-[#FDF8F0]">
+      <footer className="border-t border-[#E6D9BE] bg-white">
         <div className="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-2 px-6 py-5 text-sm text-[#4b6358] sm:flex-row sm:items-center">
           <p>© 2026 Portal Umrah & Haji</p>
           <p>Semua hak cipta dilindungi.</p>
         </div>
       </footer>
+      <ChatWidget />
     </div>
   );
 }
