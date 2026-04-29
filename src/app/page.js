@@ -1,31 +1,6 @@
-import ChatWidget from "@/components/ChatWidget";
 import Image from "next/image";
-import { BookOpenText, Newspaper, ShieldCheck, Users } from "lucide-react";
+import ChatWidget from "@/components/ChatWidget";
 import { supabase } from "@/lib/supabase";
-
-const fallbackArtikel = [
-  {
-    judul: "5 Persiapan Penting Sebelum Berangkat Umrah",
-    ringkasan:
-      "Panduan ringkas mengenai dokumen, kesehatan, dan perlengkapan agar ibadah lebih tenang.",
-    gambar:
-      "https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    judul: "Memahami Rukun Haji untuk Jamaah Pemula",
-    ringkasan:
-      "Kenali urutan rukun haji beserta tips praktis agar Anda menjalani setiap tahap dengan baik.",
-    gambar:
-      "https://images.unsplash.com/photo-1513072064285-240f87fa81e8?auto=format&fit=crop&w=1200&q=80",
-  },
-  {
-    judul: "Tips Menjaga Stamina Selama di Tanah Suci",
-    ringkasan:
-      "Strategi sederhana menjaga kebugaran fisik selama umrah dan haji, dari pola makan hingga istirahat.",
-    gambar:
-      "https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=1200&q=80",
-  },
-];
 
 function formatRupiah(harga) {
   const nilai = Number(harga);
@@ -38,381 +13,171 @@ function formatRupiah(harga) {
 }
 
 export default async function Home() {
-  const [artikelResult, paketResult, jadwalResult] = await Promise.all([
-    supabase
-      .from("artikel")
-      .select("*")
-      .eq("published", true)
-      .order("created_at", { ascending: false })
-      .limit(3),
-    supabase
-      .from("paket")
-      .select("id,nama,jenis,harga,durasi,fasilitas,thumbnail_url,tersedia")
-      .eq("tersedia", true),
-    supabase
-      .from("jadwal")
-      .select(
-        "id,maskapai,asal,tujuan,tanggal_berangkat,jam_berangkat,sisa_seat"
-      )
-      .order("tanggal_berangkat", { ascending: true })
-      .order("jam_berangkat", { ascending: true })
-      .limit(5),
+  const [paketResult, jadwalResult] = await Promise.all([
+    supabase.from("paket").select("*").eq("tersedia", true),
+    supabase.from("jadwal").select("*").order("tanggal_berangkat", { ascending: true }).limit(5),
   ]);
 
-  const artikelTerbaru =
-    artikelResult.error || !artikelResult.data?.length
-      ? fallbackArtikel
-      : artikelResult.data.map((item) => ({
-          judul: item.judul ?? item.title ?? "Artikel Umrah & Haji",
-          ringkasan: item.ringkasan ?? item.deskripsi ?? item.konten_singkat ?? "-",
-          gambar:
-            item.thumbnail ??
-            item.thumbnail_url ??
-            item.gambar ??
-            "https://images.unsplash.com/photo-1564769625905-50e93615e769?auto=format&fit=crop&w=1200&q=80",
-        }));
+  const paketList = paketResult.data || [];
+  const jadwalList = jadwalResult.data || [];
 
-  const paketUmrahHaji =
-    paketResult.error || !paketResult.data?.length
-      ? []
-      : paketResult.data.map((item) => ({
-          id: item.id,
-          nama: item.nama ?? "Paket Umrah",
-          jenis: item.jenis ?? "-",
-          harga: formatRupiah(item.harga),
-          durasi: item.durasi ?? "-",
-          fasilitas:
-            item.fasilitas ??
-            "Fasilitas paket tersedia sesuai detail program.",
-          thumbnailUrl:
-            item.thumbnail_url ??
-            "https://images.unsplash.com/photo-1578662996442-48f60103fc96?auto=format&fit=crop&w=1200&q=80",
-        }));
-
-  const paketErrorMessage = paketResult.error
-    ? `${paketResult.error.message} (code: ${paketResult.error.code ?? "-"})`
-    : null;
-  const jadwalBerangkat = (jadwalResult.data ?? []).map((item) => ({
-    id: item.id,
-    maskapai: item.maskapai ?? "-",
-    rute: `${(item.asal ?? "-").toUpperCase()} -> ${(item.tujuan ?? "-").toUpperCase()}`,
-    waktu: `${item.tanggal_berangkat ?? "-"} ${item.jam_berangkat ?? ""}`.trim(),
-    sisaSeat: Number(item.sisa_seat ?? 0),
-  }));
-
-  const daftarMaskapai = Array.from(
-    new Set((jadwalResult.data ?? []).map((item) => item.maskapai).filter(Boolean))
-  );
-
-  const flyerTerbaru = [
-    ...paketUmrahHaji.map((item) => ({
-      title: item.nama,
-      image: item.thumbnailUrl,
-    })),
-    ...artikelTerbaru.map((item) => ({
-      title: item.judul,
-      image: item.gambar,
-    })),
-  ].slice(0, 6);
-
-  const keunggulan = [
-    {
-      ikon: ShieldCheck,
-      judul: "Terpercaya",
-      deskripsi: "Informasi diverifikasi dan disusun oleh tim berpengalaman.",
-    },
-    {
-      ikon: Newspaper,
-      judul: "Info Terkini",
-      deskripsi: "Update terbaru seputar kebijakan, visa, dan jadwal keberangkatan.",
-    },
-    {
-      ikon: BookOpenText,
-      judul: "Panduan Lengkap",
-      deskripsi: "Materi persiapan ibadah dari awal hingga kepulangan.",
-    },
-    {
-      ikon: Users,
-      judul: "Komunitas Jamaah",
-      deskripsi: "Ruang berbagi pengalaman dan dukungan antarjamaah.",
-    },
+  const fotoInstagram = [
+    "photo-1591604129939-f1efa4d9f7fa",
+    "photo-1564769625905-50e93615e769",
+    "photo-1513072064285-240f87fa81e8",
+    "photo-1578662996442-48f60103fc96",
   ];
 
   return (
-    <div className="min-h-screen bg-white font-sans text-[#0A3D35]">
-      <header className="sticky top-0 z-20 border-b border-[#E6D9BE] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4">
-          <a className="text-xl font-bold tracking-tight text-[#0D7A6B]" href="#">
-            PORTAL - TANUR MUTHMAINNAH TOUR
-          </a>
+    <div className="min-h-screen bg-white font-sans">
 
-          <nav className="hidden md:block">
-            <ul className="flex items-center gap-6 text-sm font-medium text-[#0D7A6B]">
-              <li>
-                <a className="transition hover:text-[#C9A84C]" href="#">
-                  Beranda
-                </a>
-              </li>
-              <li>
-                <a className="transition hover:text-[#C9A84C]" href="#paket">
-                  Paket
-                </a>
-              </li>
-              <li>
-                <a className="transition hover:text-[#C9A84C]" href="#artikel">
-                  Artikel
-                </a>
-              </li>
-              <li>
-                <a className="transition hover:text-[#C9A84C]" href="#jadwal">
-                  Jadwal
-                </a>
-              </li>
-              <li>
-                <a className="transition hover:text-[#C9A84C]" href="#panduan">
-                  Panduan
-                </a>
-              </li>
-              <li>
-                <a className="transition hover:text-[#C9A84C]" href="#tentang">
-                  Tentang Kami
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </div>
-        <details className="border-t border-[#E6D9BE] md:hidden">
-          <summary className="cursor-pointer list-none px-6 py-3 text-sm font-semibold text-[#0D7A6B]">
-            Menu
-          </summary>
-          <nav className="bg-white px-6 pb-4">
-            <ul className="space-y-3 text-sm font-medium text-[#0D7A6B]">
-              <li>
-                <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#">
-                  Beranda
-                </a>
-              </li>
-              <li>
-                <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#paket">
-                  Paket
-                </a>
-              </li>
-              <li>
-                <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#artikel">
-                  Artikel
-                </a>
-              </li>
-              <li>
-                <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#jadwal">
-                  Jadwal
-                </a>
-              </li>
-              <li>
-                <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#panduan">
-                  Panduan
-                </a>
-              </li>
-              <li>
-                <a className="block rounded-md px-2 py-1 transition hover:bg-[#E8F4FD] hover:text-[#C9A84C]" href="#tentang">
-                  Tentang Kami
-                </a>
-              </li>
-            </ul>
-          </nav>
-        </details>
-      </header>
-
-      <main>
-        <section className="relative isolate overflow-hidden">
-          <Image
-            src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=2000&q=80"
-            alt="Masjidil Haram"
-            fill
-            priority
-            className="object-cover"
-            sizes="100vw"
-          />
-          <div className="absolute inset-0 bg-[#1C2A24]/60" />
-          <div className="relative mx-auto w-full max-w-6xl px-6 py-28 md:py-36">
-            <div className="max-w-3xl">
-              <p className="mb-5 inline-flex rounded-full bg-[#E8F4FD]/90 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-[#0D7A6B]">
-                Informasi Ibadah
-              </p>
-              <h1 className="font-serif text-4xl font-bold leading-tight text-white md:text-6xl">
-                Wawasan Umrah dan Haji yang Menenangkan Hati
-              </h1>
-              <p className="mt-6 text-lg leading-8 text-[#F8F8F0] md:text-xl">
-                Temukan berita terkini, panduan lengkap, dan rekomendasi terbaik
-                untuk perjalanan ibadah yang aman, nyaman, dan penuh makna.
-              </p>
-              <div className="mt-10 flex flex-wrap gap-4">
-                <a
-                  href="#paket"
-                  className="rounded-full bg-[#C9A84C] px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
-                >
-                  Lihat Paket Umrah
-                </a>
-                <a
-                  href="#panduan"
-                  className="rounded-full border border-white/70 bg-white/10 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
-                >
-                  Baca Panduan
-                </a>
-              </div>
+      {/* HEADER: Ubah background agar lebih netral atau gunakan salah satu warna logo */}
+      <header className="fixed top-0 z-50 w-full border-b border-gray-100 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+          <div className="flex items-center gap-3">
+            {/* --- MEMASANG LOGO --- */}
+            <div className="flex h-12 w-12 items-center justify-center">
+              <Image 
+                src="/images/logo-m.png" // Path ke file logo Anda di folder /public
+                alt="Logo Tanur Muthmainnah" 
+                width={48} 
+                height={48} 
+                className="object-contain"
+              />
+            </div>
+            {/* ------------------ */}
+            <div>
+              {/* Gunakan warna Navy/Navy Teal dari logo */}
+              <p className="text-sm font-semibold uppercase tracking-widest text-[#1D3557]">Tanur Muthmainnah Tour</p>
+              <p className="text-xs text-gray-600">Travel Umrah & Haji Terpercaya</p>
             </div>
           </div>
-        </section>
-
-        <section id="paket" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 py-20">
-          <div className="mb-10 max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0D7A6B]">
-              Paket Umrah & Haji
-            </p>
-            <h2 className="mt-2 font-serif text-3xl font-bold text-[#0A3D35] md:text-4xl">
-              Pilihan Paket Sesuai Kebutuhan Jamaah
-            </h2>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {paketUmrahHaji.map((paket) => (
-              <article
-                key={paket.id ?? paket.nama}
-                className="rounded-2xl border border-[#E6D9BE] bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
-              >
-                <Image
-                  src={paket.thumbnailUrl}
-                  alt={paket.nama}
-                  width={1200}
-                  height={800}
-                  className="mb-5 h-44 w-full rounded-xl object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <h3 className="font-serif text-2xl font-bold text-[#0D7A6B]">
-                  {paket.nama}
-                </h3>
-                <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-[#0D7A6B]">
-                  {paket.jenis}
-                </p>
-                <p className="mt-4 text-3xl font-bold text-[#C9A84C]">{paket.harga}</p>
-                <p className="mt-2 text-sm font-medium text-[#0D7A6B]">
-                  Durasi: {paket.durasi}
-                </p>
-                <p className="mt-4 min-h-20 text-sm leading-7 text-[#4B5A54]">
-                  {paket.fasilitas}
-                </p>
-                <button
-                  type="button"
-                  className="mt-6 w-full rounded-full bg-[#0D7A6B] px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
-                >
-                  Pesan Sekarang
-                </button>
-              </article>
+          {/* Gunakan warna Navy untuk navigasi */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-[#1D3557]">
+            {["Beranda", "Paket", "Jadwal", "Video", "Kontak"].map((item) => (
+              <a key={item} href={`#${item.toLowerCase()}`} className="transition hover:text-[#147F74]">
+                {item}
+              </a>
             ))}
-          </div>
-          {paketErrorMessage && (
-            <p className="mt-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-              Gagal memuat data paket dari Supabase: {paketErrorMessage}
-            </p>
-          )}
-          {!paketUmrahHaji.length && (
-            <p className="text-sm text-[#4B5A54]">
-              Belum ada paket yang tersedia saat ini.
-            </p>
-          )}
-        </section>
+          </nav>
+          
+            {/* Gunakan warna Gold dari logo */}
+            <a href="https://wa.me/628123456789"
+            className="rounded-full bg-[#C9A84C] px-5 py-2 text-sm font-semibold text-white transition hover:brightness-110"
+          >
+            Daftar Sekarang
+          </a>
+        </div>
+      </header>
+      {/* HERO */}
+      <section className="relative isolate flex min-h-screen items-center overflow-hidden">
+        <Image
+          src="https://images.unsplash.com/photo-1591604129939-f1efa4d9f7fa?auto=format&fit=crop&w=2000&q=80"
+          alt="Masjidil Haram"
+          fill
+          priority
+          className="object-cover"
+          sizes="100vw"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0A3D35]/90 via-[#0A3D35]/60 to-transparent" />
+        <div className="absolute right-20 top-1/2 -translate-y-1/2 h-96 w-96 rounded-full border border-[#C9A84C]/20 opacity-50" />
+        <div className="absolute right-32 top-1/2 -translate-y-1/2 h-72 w-72 rounded-full border border-[#C9A84C]/30 opacity-50" />
+        <div className="absolute right-44 top-1/2 -translate-y-1/2 h-48 w-48 rounded-full bg-[#C9A84C]/10" />
 
-        <section
-          id="artikel"
-          className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-20 pt-4"
-        >
-          <div className="mb-8 flex items-center justify-between">
-            <h2 className="font-serif text-3xl font-bold text-[#0A3D35]">
-              Artikel Terbaru
-            </h2>
-            <a
-              className="text-sm font-semibold text-[#0D7A6B] hover:text-[#C9A84C]"
-              href="#artikel"
+        <div className="relative mx-auto w-full max-w-7xl px-6 pt-24">
+          <div className="max-w-2xl">
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-widest text-[#C9A84C]">
+              ✦ Travel Umrah & Haji No. 1 Indonesia
+            </p>
+            <h1 className="font-serif text-5xl font-bold leading-tight text-white md:text-7xl">
+              Perjalanan <span className="text-[#C9A84C]">Suci</span> yang Menenangkan Hati
+            </h1>
+            <p className="mt-6 text-lg leading-8 text-white/80">
+              Bersama Tanur Muthmainnah Tour — 3 besar pengirim jamaah umrah terbanyak di Indonesia.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-4">
+              
+                <a href="#paket"
+                className="rounded-full bg-[#C9A84C] px-8 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:brightness-110"
+              >
+                Lihat Paket Umrah
+              </a>
+              
+                <a href="#jadwal"
+                className="rounded-full border border-white/30 bg-white/10 px-8 py-3.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20"
+              >
+                Cek Jadwal Berangkat
+              </a>
+            </div>
+            <div className="mt-16 grid grid-cols-3 gap-6 border-t border-white/10 pt-10">
+              {[
+                { angka: "6.000+", label: "Jamaah Diberangkatkan" },
+                { angka: "99", label: "Perwakilan di Indonesia" },
+                { angka: "Top 3", label: "Travel Umrah Nasional" },
+              ].map((stat) => (
+                <div key={stat.label}>
+                  <p className="text-3xl font-bold text-[#C9A84C]">{stat.angka}</p>
+                  <p className="mt-1 text-xs text-white/60">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FLIGHT DETAIL */}
+      <section id="jadwal" className="bg-[#0A3D35] py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-10 flex items-end justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A84C]">Jadwal Keberangkatan</p>
+              <h2 className="mt-2 font-serif text-3xl font-bold text-white md:text-4xl">
+                Flight Detail Umrah & Haji
+              </h2>
+            </div>
+            
+              <a href="/jadwal"
+              className="rounded-full border border-[#C9A84C]/40 px-5 py-2 text-sm text-[#C9A84C] hover:bg-[#C9A84C]/10"
             >
               Lihat Semua
             </a>
           </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {artikelTerbaru.map((artikel) => (
-              <article
-                key={artikel.judul}
-                className="overflow-hidden rounded-2xl border border-[#E6D9BE] bg-white shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-lg"
-              >
-                <Image
-                  src={artikel.gambar}
-                  alt={artikel.judul}
-                  width={1200}
-                  height={800}
-                  className="h-52 w-full object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <div className="p-6">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#0D7A6B]">
-                    Artikel
-                  </p>
-                  <h3 className="mt-3 font-serif text-xl font-bold leading-8 text-[#0A3D35]">
-                    {artikel.judul}
-                  </h3>
-                  <p className="mt-3 text-sm leading-7 text-[#4B5A54]">
-                    {artikel.ringkasan}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section id="panduan" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-20">
-          <div className="rounded-2xl border border-[#E6D9BE] bg-[#E8F4FD] p-10">
-            <h2 className="font-serif text-3xl font-bold text-[#0A3D35]">
-              Panduan Singkat
-            </h2>
-            <p className="mt-4 max-w-3xl text-[#4B5A54]">
-              Dapatkan panduan dasar mulai dari persiapan dokumen, jadwal manasik,
-              hingga tips menjaga kesehatan selama perjalanan ibadah.
-            </p>
-          </div>
-        </section>
-
-        <section id="jadwal" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-20">
-          <div className="mb-6 flex items-end justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-[#0D7A6B]">
-                Jadwal Terdekat
-              </p>
-              <h2 className="mt-2 font-serif text-3xl font-bold text-[#0A3D35]">
-                Keberangkatan Umrah & Haji
-              </h2>
-            </div>
-            <a href="/jadwal" className="text-sm font-semibold text-[#0D7A6B] hover:text-[#C9A84C]">
-              Lihat Semua
-            </a>
-          </div>
-          <div className="overflow-x-auto rounded-2xl border border-[#E6D9BE] bg-white">
-            <table className="w-full min-w-[700px] text-sm">
-              <thead className="bg-[#F7F0DE] text-left text-[#5E4A1D]">
-                <tr>
-                  <th className="px-4 py-3">Maskapai</th>
-                  <th className="px-4 py-3">Rute</th>
-                  <th className="px-4 py-3">Berangkat</th>
-                  <th className="px-4 py-3">Sisa Seat</th>
+          <div className="overflow-hidden rounded-2xl border border-white/10">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-white/10 bg-white/5 text-left text-xs font-semibold uppercase tracking-widest text-[#C9A84C]">
+                  {["Maskapai", "Rute", "Berangkat", "Pulang", "Hari", "Sisa Seat", "Status"].map((h) => (
+                    <th key={h} className="px-5 py-4">{h}</th>
+                  ))}
                 </tr>
               </thead>
-              <tbody>
-                {jadwalBerangkat.map((row) => (
-                  <tr key={row.id} className="border-t border-[#EFE3C9]">
-                    <td className="px-4 py-3 font-medium text-[#0A3D35]">{row.maskapai}</td>
-                    <td className="px-4 py-3 text-[#4B5A54]">{row.rute}</td>
-                    <td className="px-4 py-3 text-[#4B5A54]">{row.waktu}</td>
-                    <td className="px-4 py-3 font-semibold text-[#0D7A6B]">{row.sisaSeat}</td>
+              <tbody className="divide-y divide-white/5">
+                {jadwalList.map((item) => (
+                  <tr key={item.id} className="text-white/80 transition hover:bg-white/5">
+                    <td className="px-5 py-4 font-medium text-white">{item.maskapai}</td>
+                    <td className="px-5 py-4">{item.kota_asal} - {item.kota_tujuan}</td>
+                    <td className="px-5 py-4 font-mono">{item.tanggal_berangkat} {item.jam_berangkat}</td>
+                    <td className="px-5 py-4 font-mono">{item.tanggal_pulang}</td>
+                    <td className="px-5 py-4">{item.jumlah_hari} hari</td>
+                    <td className="px-5 py-4">
+                      <span className={`font-bold ${item.sisa_seat === 0 ? "text-red-400" : item.sisa_seat < 20 ? "text-yellow-400" : "text-green-400"}`}>
+                        {item.sisa_seat === 0 ? "FULL" : `${item.sisa_seat} seat`}
+                      </span>
+                    </td>
+                    <td className="px-5 py-4">
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        item.status === "open" ? "bg-green-900/50 text-green-300" :
+                        item.status === "almost_full" ? "bg-yellow-900/50 text-yellow-300" :
+                        "bg-red-900/50 text-red-300"
+                      }`}>
+                        {item.status === "open" ? "OPEN" : item.status === "almost_full" ? "ALMOST FULL" : "FULL"}
+                      </span>
+                    </td>
                   </tr>
                 ))}
-                {!jadwalBerangkat.length && (
+                {!jadwalList.length && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-[#4B5A54]">
+                    <td colSpan={7} className="px-5 py-10 text-center text-white/40">
                       Jadwal belum tersedia.
                     </td>
                   </tr>
@@ -420,124 +185,196 @@ export default async function Home() {
               </tbody>
             </table>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mx-auto w-full max-w-6xl px-6 pb-20">
-          <div className="grid gap-8 md:grid-cols-2">
-            <article className="rounded-2xl border border-[#E6D9BE] bg-white p-7">
-              <h3 className="font-serif text-2xl font-bold text-[#0A3D35]">
-                Daftar Maskapai Rekanan
-              </h3>
-              <div className="mt-5 flex flex-wrap gap-3">
-                {daftarMaskapai.map((maskapai) => (
-                  <span
-                    key={maskapai}
-                    className="rounded-full bg-[#E8F4FD] px-4 py-2 text-sm font-semibold text-[#356175]"
-                  >
-                    {maskapai}
-                  </span>
-                ))}
-                {!daftarMaskapai.length && (
-                  <p className="text-sm text-[#4B5A54]">Belum ada data maskapai.</p>
-                )}
-              </div>
-            </article>
-
-            <article className="rounded-2xl border border-[#E6D9BE] bg-white p-7">
-              <h3 className="font-serif text-2xl font-bold text-[#0A3D35]">
-                Video Umrah Haji Terbaru
-              </h3>
-              <div className="mt-5 overflow-hidden rounded-xl border border-[#E6D9BE]">
-                <iframe
-                  className="h-64 w-full"
-                  src="https://www.youtube.com/embed/oquA0V2U9Ag"
-                  title="Video Umrah Haji"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                />
-              </div>
-            </article>
+      {/* PAKET */}
+      <section id="paket" className="py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-12 text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D7A6B]">Pilihan Paket</p>
+            <h2 className="mt-2 font-serif text-4xl font-bold text-[#0A3D35]">
+              Paket Umrah & Haji Terbaik
+            </h2>
+            <p className="mt-4 text-[#4B5A54]">Pilih paket yang sesuai kebutuhan Bapak/Ibu</p>
           </div>
-        </section>
-
-        <section className="mx-auto w-full max-w-6xl px-6 pb-20">
-          <div className="mb-6">
-            <h3 className="font-serif text-3xl font-bold text-[#0A3D35]">
-              Flyer Umrah Haji Terbaru
-            </h3>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {flyerTerbaru.map((flyer) => (
+          <div className="grid gap-8 md:grid-cols-3">
+            {paketList.map((paket, i) => (
               <article
-                key={`${flyer.title}-${flyer.image}`}
-                className="overflow-hidden rounded-2xl border border-[#E6D9BE] bg-white"
+                key={paket.id}
+                className={`relative overflow-hidden rounded-3xl border transition duration-300 hover:-translate-y-2 hover:shadow-2xl ${
+                  i === 1 ? "border-[#C9A84C] shadow-xl shadow-[#C9A84C]/10" : "border-gray-100"
+                }`}
               >
-                <Image
-                  src={flyer.image}
-                  alt={flyer.title}
-                  width={1200}
-                  height={900}
-                  className="h-48 w-full object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                />
-                <p className="px-4 py-3 text-sm font-semibold text-[#0A3D35]">
-                  {flyer.title}
-                </p>
+                {i === 1 && (
+                  <div className="absolute top-4 right-4 rounded-full bg-[#C9A84C] px-3 py-1 text-xs font-bold text-white">
+                    TERPOPULER
+                  </div>
+                )}
+                <div className="bg-gradient-to-br from-[#0A3D35] to-[#0D7A6B] p-8">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-[#C9A84C]">{paket.jenis}</p>
+                  <h3 className="mt-2 font-serif text-2xl font-bold text-white">{paket.nama}</h3>
+                  <p className="mt-4 text-4xl font-bold text-[#C9A84C]">{formatRupiah(paket.harga)}</p>
+                  <p className="mt-1 text-sm text-white/60">Durasi {paket.durasi}</p>
+                </div>
+                <div className="bg-white p-8">
+                  <ul className="space-y-3">
+                    {(Array.isArray(paket.fasilitas) ? paket.fasilitas : [paket.fasilitas]).map((f, fi) => (
+                      <li key={fi} className="flex items-center gap-3 text-sm text-[#4B5A54]">
+                        <span className="text-[#0D7A6B]">✓</span>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <button
+                    type="button"
+                    className={`mt-8 w-full rounded-full py-3.5 text-sm font-semibold transition hover:brightness-110 ${
+                      i === 1 ? "bg-[#C9A84C] text-white" : "bg-[#0A3D35] text-white"
+                    }`}
+                  >
+                    Pesan Sekarang
+                  </button>
+                </div>
               </article>
             ))}
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section className="mx-auto w-full max-w-6xl px-6 pb-20">
-          <div className="mb-10 max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-wide text-[#0D7A6B]">
-              Mengapa Pilih Kami
-            </p>
-            <h2 className="mt-2 font-serif text-3xl font-bold text-[#0A3D35] md:text-4xl">
-              Komitmen Kami untuk Jamaah Indonesia
+      {/* YOUTUBE */}
+      <section id="video" className="bg-[#F8F9FA] py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-12 text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D7A6B]">Channel Resmi</p>
+            <h2 className="mt-2 font-serif text-4xl font-bold text-[#0A3D35]">
+              Video Keberangkatan Jamaah
             </h2>
           </div>
-          <div className="grid gap-6 md:grid-cols-4">
-            {keunggulan.map((item) => {
-              const Icon = item.ikon;
-              return (
-              <article
-                key={item.judul}
-                className="rounded-2xl border border-[#E6D9BE] bg-white p-6 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="overflow-hidden rounded-2xl shadow-lg">
+              <iframe
+                className="h-72 w-full"
+                src="https://www.youtube.com/embed?listType=user_uploads&list=tanurmuthmainnah_officials"
+                title="Tanur Muthmainnah YouTube"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </div>
+            <div className="flex flex-col justify-center gap-6 rounded-2xl bg-[#0A3D35] p-10 text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-red-600 text-2xl">
+                ▶
+              </div>
+              <h3 className="font-serif text-2xl font-bold">Subscribe Channel Kami</h3>
+              <p className="text-white/70">
+                Dapatkan update terbaru keberangkatan jamaah, testimoni, dan panduan ibadah.
+              </p>
+              
+                <a href="https://youtube.com/@tanurmuthmainnah_officials"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 text-sm font-semibold text-white hover:brightness-110"
               >
-                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full bg-[#E8F4FD] text-[#0D7A6B]">
-                  <Icon size={22} strokeWidth={2.2} />
-                </div>
-                <h3 className="font-serif text-xl font-bold text-[#0A3D35]">
-                  {item.judul}
-                </h3>
-                <p className="mt-2 text-sm leading-7 text-[#4B5A54]">
-                  {item.deskripsi}
-                </p>
-              </article>
-              );
-            })}
+                ▶ Tonton di YouTube
+              </a>
+            </div>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <section id="tentang" className="mx-auto w-full max-w-6xl scroll-mt-28 px-6 pb-24">
-          <div className="rounded-2xl bg-[#0D7A6B] p-10 text-white">
-            <h2 className="font-serif text-3xl font-bold">Tentang Kami</h2>
-            <p className="mt-4 max-w-3xl text-[#E7F0EA]">
-              Portal ini hadir untuk menyediakan informasi tepercaya seputar umrah
-              dan haji, agar jamaah Indonesia bisa beribadah dengan persiapan yang
-              matang dan tenang.
-            </p>
+      {/* INSTAGRAM */}
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-12 text-center">
+            <p className="text-xs font-semibold uppercase tracking-widest text-[#0D7A6B]">Social Media</p>
+            <h2 className="mt-2 font-serif text-4xl font-bold text-[#0A3D35]">
+              Follow Instagram Kami
+            </h2>
+            <p className="mt-4 text-[#4B5A54]">@tanurmuthmainnah</p>
           </div>
-        </section>
-      </main>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+  {fotoInstagram.map((photo) => (
+  <a 
+    key={photo} // Pindahkan key ke sini
+    href="https://instagram.com/tanurmuthmainnah"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="group relative overflow-hidden rounded-2xl"
+  >
+    <Image
+      src={`https://images.unsplash.com/${photo}?auto=format&fit=crop&w=600&q=80`}
+      alt="Instagram Tanur"
+      width={600}
+      height={600}
+      className="h-48 w-full object-cover transition duration-300 group-hover:scale-110"
+    />
+    <div className="absolute inset-0 flex items-center justify-center bg-[#0A3D35]/0 transition duration-300 group-hover:bg-[#0A3D35]/60">
+      <span className="text-2xl opacity-0 transition duration-300 group-hover:opacity-100">📷</span>
+    </div>
+  </a>
+))}
+          </div>
+          <div className="mt-8 text-center">
+            
+              <a href="https://instagram.com/tanurmuthmainnah"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-[#0D7A6B] px-8 py-3 text-sm font-semibold text-[#0D7A6B] hover:bg-[#0D7A6B] hover:text-white transition"
+            >
+              📷 Follow @tanurmuthmainnah
+            </a>
+          </div>
+        </div>
+      </section>
 
-      <footer className="border-t border-[#E6D9BE] bg-white">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-start justify-between gap-2 px-6 py-5 text-sm text-[#4b6358] sm:flex-row sm:items-center">
-          <p>© 2026 Portal Umrah & Haji</p>
-          <p>Semua hak cipta dilindungi.</p>
+      {/* FOOTER */}
+      <footer className="bg-[#0A3D35] py-16 text-white">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="grid gap-10 md:grid-cols-3">
+            <div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#C9A84C] text-xl">🕌</div>
+                <p className="font-bold text-[#C9A84C]">Tanur Muthmainnah Tour</p>
+              </div>
+              <p className="mt-4 text-sm text-white/60 leading-7">
+                Travel Umrah & Haji terpercaya. Akreditasi A, Top 3 nasional, 6000+ jamaah diberangkatkan.
+              </p>
+            </div>
+            <div>
+              <p className="font-semibold text-[#C9A84C]">Navigasi</p>
+              <ul className="mt-4 space-y-2 text-sm text-white/60">
+                {["Beranda", "Paket", "Jadwal", "Video", "Kontak"].map((item) => (
+                  <li key={item}>
+                    <a href={`#${item.toLowerCase()}`} className="hover:text-white">{item}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <p className="font-semibold text-[#C9A84C]">Ikuti Kami</p>
+              <div className="mt-4 flex gap-4">
+                
+                  <a href="https://instagram.com/tanurmuthmainnah"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg hover:bg-[#C9A84C]"
+                >
+                  📷
+                </a>
+                
+                  <a href="https://youtube.com/@tanurmuthmainnah_officials"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-lg hover:bg-red-600"
+                >
+                  ▶
+                </a>
+              </div>
+              <p className="mt-6 text-sm text-white/60">© 2026 Tanur Muthmainnah Tour. All rights reserved.</p>
+            </div>
+          </div>
         </div>
       </footer>
+
       <ChatWidget />
     </div>
   );
